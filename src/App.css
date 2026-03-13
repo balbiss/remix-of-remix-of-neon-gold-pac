@@ -1,6 +1,6 @@
 .game-container {
   width: 100%;
-  max-width: 480px;
+  max-width: 600px; /* Increased from 480px for better fill */
   height: 100dvh;
   margin: 0 auto;
   background-color: #000;
@@ -39,18 +39,18 @@
   height: auto;
   min-height: 0;
   max-height: 100%;
-  padding: 0 4px; /* Small safety padding */
+  padding: 0; /* Removed padding to maximize space */
 }
 
 .game-canvas-wrapper canvas {
-  width: 95vw !important;
+  width: 100vw !important; /* Full width edge-to-edge */
   height: auto !important;
-  max-width: 95vw !important;
-  max-height: 50vh !important;
+  max-width: 100vw !important;
+  max-height: 75vh !important; /* SIGNIFICANT INCREASE! Fill the vertical space */
   object-fit: contain;
-  image-rendering: pixelated;
-  border: 1px solid rgba(255, 215, 0, 0.1);
-  border-radius: 4px;
+  image-rendering: auto;
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  border-radius: 8px;
 }
 
 .bet-panel-fixed {
