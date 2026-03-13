@@ -68,11 +68,11 @@ const Index = () => {
 
   return (
     <div className="h-[100dvh] flex flex-col bg-background overflow-hidden select-none">
-      <GameHeader balance={balance} />
+      {!isPlaying && <GameHeader balance={balance} />}
 
       {/* Game canvas — maximized for mobile */}
-      <div className="flex-1 flex items-center justify-center px-0.5 py-1 min-h-0">
-        <div className={`w-full relative ${isPlaying ? 'max-w-full px-0' : 'max-w-[480px]'}`}>
+      <div className="flex-1 flex items-center justify-center min-h-0">
+        <div className={`w-full relative ${isPlaying ? 'max-w-full h-full flex items-center justify-center' : 'max-w-[480px] px-0.5 py-1'}`}>
           <canvas
             ref={canvasRef}
             width={COLS * CELL_SIZE}
