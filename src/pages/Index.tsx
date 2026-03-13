@@ -72,7 +72,7 @@ const Index = () => {
 
       {/* Game canvas — maximized for mobile */}
       <div className="flex-1 flex items-center justify-center px-0.5 py-1 min-h-0">
-        <div className="w-full max-w-[480px] relative">
+        <div className={`w-full relative ${isPlaying ? 'max-w-full px-0' : 'max-w-[480px]'}`}>
           <canvas
             ref={canvasRef}
             width={COLS * CELL_SIZE}
