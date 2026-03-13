@@ -37,27 +37,29 @@
 
 .game-canvas-wrapper {
   flex: 1;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: 8px;
-  box-sizing: border-box;
+  padding: 0 8px; /* Safe gutters */
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .game-canvas-wrapper canvas {
+  width: 100% !important;
+  height: auto !important;
   max-width: 100%;
-  max-height: calc(100dvh - 220px);
-  width: auto;
-  height: auto;
+  max-height: calc(100dvh - 240px);
   aspect-ratio: 19 / 22;
   object-fit: contain;
-  image-rendering: auto;
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  border-radius: 12px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  image-rendering: pixelated; /* Sharper on mobile */
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  background-color: #000;
+  margin: 0 auto;
 }
 
 .bet-panel-fixed {

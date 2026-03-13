@@ -57,6 +57,7 @@
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
   }
 
   html, body, #root {
@@ -64,10 +65,11 @@
     width: 100vw;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Global block for scrolling */
+    overflow: hidden;
     background-color: #000;
-    position: fixed; /* Prevent bouncy scrolling on iOS */
+    position: fixed;
     touch-action: none;
+    -webkit-overflow-scrolling: none;
   }
 
   body {
