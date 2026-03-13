@@ -59,17 +59,17 @@ const Auth = () => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md z-10 space-y-12"
+        className="w-full max-w-md z-10 space-y-6 md:space-y-12"
       >
         <div className="flex flex-col items-center text-center space-y-2">
           <motion.div
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
-            className="w-20 h-20 bg-primary/10 rounded-3xl border border-primary/20 flex items-center justify-center mb-4 glow-gold"
+            className="w-14 h-14 md:w-20 md:h-20 bg-primary/10 rounded-2xl md:rounded-3xl border border-primary/20 flex items-center justify-center mb-2 md:mb-4 glow-gold"
           >
-            <div className="text-4xl">💎</div>
+            <div className="text-2xl md:text-4xl">💎</div>
           </motion.div>
-          <h1 className="text-6xl font-[1000] text-primary tracking-tighter uppercase italic leading-none text-glow-gold">
+          <h1 className="text-4xl md:text-6xl font-[1000] text-primary tracking-tighter uppercase italic leading-none text-glow-gold">
             PAC<span className="text-white">BET</span>
           </h1>
           <p className="text-[10px] text-muted-foreground uppercase tracking-[0.5em] font-black opacity-40">
@@ -77,11 +77,11 @@ const Auth = () => {
           </p>
         </div>
 
-        <div className="bg-zinc-950/50 backdrop-blur-3xl border border-white/5 p-8 rounded-[2.5rem] shadow-2xl relative">
+        <div className="bg-zinc-950/50 backdrop-blur-3xl border border-white/5 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl relative">
           <div className="bottom-gradient absolute top-0 left-0" />
           
           <Tabs defaultValue="login" className="w-full" onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2 mb-10">
+            <TabsList className="grid w-full grid-cols-2 mb-6 md:mb-10">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="signup">Cadastro</TabsTrigger>
             </TabsList>
