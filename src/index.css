@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 230 15% 8%;
+    --foreground: 45 100% 95%;
+
+    --card: 230 15% 12%;
+    --card-foreground: 45 100% 95%;
+
+    --popover: 230 15% 10%;
+    --popover-foreground: 45 100% 95%;
+
+    --primary: 45 100% 50%;
+    --primary-foreground: 230 15% 8%;
+
+    --secondary: 195 100% 50%;
+    --secondary-foreground: 230 15% 8%;
+
+    --muted: 230 15% 16%;
+    --muted-foreground: 230 10% 55%;
+
+    --accent: 195 100% 50%;
+    --accent-foreground: 230 15% 8%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 230 15% 20%;
+    --input: 230 15% 18%;
+    --ring: 45 100% 50%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 230 15% 6%;
+    --sidebar-foreground: 45 100% 95%;
+    --sidebar-primary: 45 100% 50%;
+    --sidebar-primary-foreground: 230 15% 8%;
+    --sidebar-accent: 230 15% 14%;
+    --sidebar-accent-foreground: 45 100% 95%;
+    --sidebar-border: 230 15% 18%;
+    --sidebar-ring: 45 100% 50%;
+
+    --neon-gold: 45 100% 50%;
+    --neon-blue: 195 100% 50%;
+    --neon-pink: 330 100% 60%;
+    --neon-green: 150 100% 50%;
+    --neon-red: 0 100% 55%;
+    --surface-glass: 230 15% 12%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Montserrat', sans-serif;
+  }
+}
+
+@layer utilities {
+  .glow-gold {
+    box-shadow: 0 0 15px hsl(45 100% 50% / 0.4), 0 0 30px hsl(45 100% 50% / 0.15);
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 15px hsl(195 100% 50% / 0.4), 0 0 30px hsl(195 100% 50% / 0.15);
+  }
+
+  .text-glow-gold {
+    text-shadow: 0 0 10px hsl(45 100% 50% / 0.6), 0 0 20px hsl(45 100% 50% / 0.3);
+  }
+
+  .text-glow-blue {
+    text-shadow: 0 0 10px hsl(195 100% 50% / 0.6), 0 0 20px hsl(195 100% 50% / 0.3);
+  }
+
+  .glass-panel {
+    background: hsl(var(--surface-glass) / 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border));
+  }
+}
+
+@keyframes coin-fall {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes pulse-neon {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.animate-coin-fall {
+  animation: coin-fall 2s ease-in forwards;
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 1.5s ease-in-out infinite;
+}
+
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
+}
