@@ -38,28 +38,31 @@
 .game-canvas-wrapper {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: 0 8px; /* Safe gutters */
+  padding: 16px; /* Increased padding for better scaling */
   overflow: hidden;
   box-sizing: border-box;
+  position: relative;
 }
 
 .game-canvas-wrapper canvas {
-  width: 100% !important;
-  height: auto !important;
+  width: auto;
+  height: auto;
   max-width: 100%;
-  max-height: calc(100dvh - 240px);
+  max-height: 100%;
   aspect-ratio: 19 / 22;
   object-fit: contain;
-  image-rendering: pixelated; /* Sharper on mobile */
-  border: 1px solid rgba(255, 215, 0, 0.3);
+  image-rendering: -webkit-optimize-contrast; /* Clearer scaling */
+  border: 2px solid rgba(0, 102, 255, 0.4); /* Blue neon border */
   border-radius: 8px;
   background-color: #000;
   margin: 0 auto;
+  box-shadow: 0 0 20px rgba(0, 102, 255, 0.15);
 }
 
 .bet-panel-fixed {
