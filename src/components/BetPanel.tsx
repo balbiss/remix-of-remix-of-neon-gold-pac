@@ -9,7 +9,7 @@ interface BetPanelProps {
   isPlaying: boolean;
 }
 
-const QUICK_BETS = [1, 5, 10, 25];
+const QUICK_BETS = [10, 20, 50, 100, 500];
 
 export function BetPanel({ betAmount, onBetChange, onPlay, disabled, isPlaying }: BetPanelProps) {
   return (

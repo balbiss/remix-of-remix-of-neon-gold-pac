@@ -21,10 +21,9 @@ const Index = () => {
   const [rounds, setRounds] = useState<RoundResult[]>([]);
   const [roundCounter, setRoundCounter] = useState(0);
   const [cashedOut, setCashedOut] = useState(false);
-  const { canvasRef, gameState, coinsEaten, totalCoins, startGame, setDirection, setGameState } = usePacmanGame();
+  const { canvasRef, gameState, coinsEaten, totalCoins, currentMultiplier, startGame, setDirection, setGameState } = usePacmanGame();
 
-  const coinValue = totalCoins > 0 ? (betAmount * 2) / totalCoins : 0;
-  const earnings = coinsEaten * coinValue;
+  const earnings = betAmount * currentMultiplier;
   const isPlaying = gameState === 'playing';
   const showParticles = gameState === 'won' || cashedOut;
   const isLost = gameState === 'lost';
@@ -116,12 +115,12 @@ const Index = () => {
       }
     }
 
-    const cashOutAmount = cashedOut ? earnings : (won ? betAmount * 2 : 0);
+    const wonAmount = won ? (cashedOut ? earnings : betAmount * currentMultiplier) : 0;
 
     setRoundCounter(prev => prev + 1);
     setRounds(prev => [
       ...prev,
-      { id: roundCounter, amount: won ? cashOutAmount : betAmount, won },
+      { id: roundCounter, amount: won ? wonAmount : betAmount, won },
     ]);
     setCashedOut(false);
     setGameState('idle');

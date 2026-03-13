@@ -60,6 +60,7 @@ export function usePacmanGame() {
   const totalCoins = countCoins();
   const [gameState, setGameState] = useState<GameState>('idle');
   const [coinsEaten, setCoinsEaten] = useState(0);
+  const [currentMultiplier, setCurrentMultiplier] = useState(1.0);
   const [maze, setMaze] = useState<number[][]>([]);
   const pacmanRef = useRef<Position>(findSpawn(4));
   const pacmanDirRef = useRef<Direction>('right');
@@ -152,6 +153,23 @@ export function usePacmanGame() {
         localMaze[gridY][gridX] = 2;
         localCoins++;
         setCoinsEaten(localCoins);
+        
+        // Multiplier Curve Logic
+        const ratio = localCoins / totalCoins;
+        let newMult = 1.0;
+        if (localCoins <= 20) {
+          newMult = 1.0 + (localCoins / 20) * 0.1;
+        } else if (ratio < 0.9) {
+          const progress = (localCoins - 20) / (totalCoins * 0.9 - 20);
+          newMult = 1.1 + Math.pow(progress, 2.5) * (5.0 - 1.1);
+        } else if (ratio < 1.0) {
+          const progress = (ratio - 0.9) / 0.1;
+          newMult = 5.0 + progress * 4.9;
+        } else {
+          newMult = 10.0;
+        }
+        setCurrentMultiplier(parseFloat(newMult.toFixed(2)));
+
         vibrateLight();
         playCoinSound();
         if (localCoins >= totalCoins) { setGameState('won'); return; }
@@ -209,6 +227,25 @@ export function usePacmanGame() {
         ctx.shadowBlur = 10; ctx.shadowColor = color;
         ctx.fillStyle = color;
         if (isPac) {
+          // Dynamic Multiplier Glow & Fire
+          const mult = currentMultiplier;
+          const isHighStakes = mult >= 2.0;
+          
+          if (isHighStakes) {
+            // "Fire" effect using glowPhase
+            const pulse = (Math.sin(Date.now() / 50) + 1) / 2;
+            ctx.shadowBlur = 15 + pulse * 15;
+            ctx.shadowColor = mult >= 5.0 ? '#FFD700' : '#FF4500';
+            
+            // Draw "Fire" particles behind
+            for (let i = 0; i < 3; i++) {
+              ctx.beginPath();
+              ctx.fillStyle = mult >= 5.0 ? `rgba(255, 215, 0, ${0.3 * pulse})` : `rgba(255, 69, 0, ${0.4 * pulse})`;
+              ctx.arc(ex + (Math.random() - 0.5) * r * 2, ey + (Math.random() - 0.5) * r * 2, r * 0.5, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+
           const angles: Record<Direction, number> = { right: 0, down: 0.5, left: 1, up: 1.5 };
           const startAngle = angles[dir || pacmanDirRef.current];
           const mouthSize = mouthOpenRef.current ? 0.22 : 0.04;
@@ -217,6 +254,22 @@ export function usePacmanGame() {
           ctx.arc(ex, ey, r, (startAngle + mouthSize) * Math.PI, (startAngle + 2 - mouthSize) * Math.PI);
           ctx.lineTo(ex, ey);
           ctx.fill();
+
+          // Multiplier Text Display
+          ctx.save();
+          ctx.font = `black ${Math.max(10, cellW * 0.45)}px 'Inter'`;
+          ctx.textAlign = 'center';
+          ctx.shadowBlur = 4;
+          ctx.shadowColor = 'black';
+          
+          let color = '#FFFFFF';
+          if (mult >= 5.0) color = '#FFD700'; // Gold
+          else if (mult >= 2.5) color = '#FFD700'; // Gold but user said 2.5x
+          else if (mult >= 1.5) color = '#4ADE80'; // Green
+          
+          ctx.fillStyle = color;
+          ctx.fillText(`${mult.toFixed(1)}x`, ex, ey - r * 1.5);
+          ctx.restore();
         } else {
           ctx.beginPath(); ctx.arc(ex, ey - r * 0.2, r, Math.PI, 0);
           ctx.lineTo(ex + r, ey + r * 0.6);
@@ -241,5 +294,5 @@ export function usePacmanGame() {
     return () => cancelAnimationFrame(animFrameRef.current);
   }, [gameState, totalCoins]);
 
-  return { canvasRef, gameState, coinsEaten, totalCoins, startGame, setDirection, setGameState };
+  return { canvasRef, gameState, coinsEaten, totalCoins, currentMultiplier, startGame, setDirection, setGameState };
 }
