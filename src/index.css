@@ -70,17 +70,18 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', 'Montserrat', sans-serif;
-    font-size: 16px; /* Increased from 14px */
-    line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.5;
     overscroll-behavior-y: contain;
     -webkit-tap-highlight-color: transparent;
   }
 
-  h1 { font-size: 32px; font-weight: 900; }
-  h2 { font-size: 24px; font-weight: 800; }
-  h3 { font-size: 20px; font-weight: 700; }
-  p, span, label { font-size: 16px; }
-  .text-xs { font-size: 13px !important; }
+  h1 { font-size: 24px; font-weight: 900; }
+  h2 { font-size: 20px; font-weight: 800; }
+  h3 { font-size: 16px; font-weight: 700; }
+  p, span, label { font-size: 14px; }
+  .text-xs { font-size: 12px !important; }
+  .text-[8px], .text-[9px], .text-[10px], .text-[7px] { font-size: 12px !important; } /* No text smaller than 12px */
 }
 
 @layer utilities {

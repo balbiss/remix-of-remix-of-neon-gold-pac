@@ -19,21 +19,21 @@ export function CashOutButton({ earnings, onCashOut, lost }: CashOutButtonProps)
   }, [lost]);
 
   return (
-    <div className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-[400px]">
+    <div className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-40 w-[85%] max-w-[360px]">
       <button
         onClick={onCashOut}
         disabled={earnings <= 0 || lost}
         className={`
-          w-full h-[64px] rounded-[1.25rem] font-black text-lg flex items-center justify-center gap-3
-          transition-all active:scale-[0.97] disabled:cursor-not-allowed uppercase italic tracking-wider
+          w-full py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2
+          transition-all active:scale-[0.97] disabled:cursor-not-allowed
           ${showLost
             ? 'bg-destructive text-destructive-foreground animate-shake'
-            : 'bg-primary text-black glow-gold hover:opacity-95 disabled:opacity-40'
+            : 'bg-primary text-primary-foreground glow-gold hover:opacity-90 disabled:opacity-40'
           }
         `}
       >
-        <HandCoins className={`h-6 w-6 ${showLost ? 'fill-none' : 'fill-black'}`} />
-        <span className="font-black">{showLost ? 'PERDEU TUDO' : `RESGATAR R$ ${earnings.toFixed(2)}`}</span>
+        <HandCoins className="h-4 w-4" />
+        {showLost ? 'PERDEU TUDO' : `RESGATAR R$ ${earnings.toFixed(2)}`}
       </button>
     </div>
   );

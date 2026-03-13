@@ -142,9 +142,9 @@ const Index = () => {
             className="block shadow-[0_0_80px_rgba(0,0,0,0.8)]"
           />
           {isPlaying && (
-            <div className="absolute top-6 right-6 bg-black/70 backdrop-blur-md rounded-2xl px-4 py-2 border border-white/10 glow-gold z-30">
-              <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest leading-tight opacity-70">Ganhos</p>
-              <p className="text-xl font-[1000] text-primary text-glow-gold leading-tight italic">
+            <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md rounded-xl px-3 py-1.5 border border-white/10 glow-gold">
+              <p className="text-[8px] text-muted-foreground uppercase font-black tracking-widest leading-tight">Ganhos</p>
+              <p className="text-base font-[1000] text-primary text-glow-gold leading-tight italic">
                 R$ {earnings.toFixed(2)}
               </p>
             </div>
