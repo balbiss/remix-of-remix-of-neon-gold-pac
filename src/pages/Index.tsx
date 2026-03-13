@@ -5,6 +5,7 @@ import { GameOverlay } from '@/components/GameOverlay';
 import { GoldenParticles } from '@/components/GoldenParticles';
 import { VirtualJoystick } from '@/components/VirtualJoystick';
 import { RoundHistory, RoundResult } from '@/components/RoundHistory';
+import { CashOutButton } from '@/components/CashOutButton';
 import { usePacmanGame } from '@/game/usePacmanGame';
 import { useSwipeControls } from '@/hooks/useSwipeControls';
 import { playWinSound } from '@/utils/sounds';
@@ -15,12 +16,14 @@ const Index = () => {
   const [betAmount, setBetAmount] = useState(5);
   const [rounds, setRounds] = useState<RoundResult[]>([]);
   const [roundCounter, setRoundCounter] = useState(0);
+  const [cashedOut, setCashedOut] = useState(false);
   const { canvasRef, gameState, coinsEaten, totalCoins, startGame, setDirection, setGameState } = usePacmanGame();
 
   const coinValue = totalCoins > 0 ? (betAmount * 2) / totalCoins : 0;
   const earnings = coinsEaten * coinValue;
   const isPlaying = gameState === 'playing';
-  const showParticles = gameState === 'won';
+  const showParticles = gameState === 'won' || cashedOut;
+  const isLost = gameState === 'lost';
 
   useSwipeControls(setDirection, isPlaying);
 
@@ -40,7 +43,6 @@ const Index = () => {
     };
   }, [isPlaying]);
 
-  // Play win sound when game is won
   useEffect(() => {
     if (gameState === 'won') {
       playWinSound();
@@ -50,27 +52,41 @@ const Index = () => {
   const handlePlay = () => {
     if (betAmount > balance || betAmount <= 0) return;
     setBalance(prev => prev - betAmount);
+    setCashedOut(false);
     startGame();
+  };
+
+  const handleCashOut = () => {
+    if (!isPlaying || earnings <= 0) return;
+    setCashedOut(true);
+    playWinSound();
+    setGameState('won');
   };
 
   const handleOverlayClose = () => {
     const won = gameState === 'won';
+    const cashOutAmount = cashedOut ? earnings : (won ? betAmount * 2 : 0);
+
     if (won) {
-      setBalance(prev => prev + betAmount * 2);
+      setBalance(prev => prev + cashOutAmount);
     }
+
     setRoundCounter(prev => prev + 1);
     setRounds(prev => [
       ...prev,
-      { id: roundCounter, amount: won ? betAmount : betAmount, won },
+      { id: roundCounter, amount: cashedOut ? earnings : betAmount, won },
     ]);
+    setCashedOut(false);
     setGameState('idle');
   };
+
+  const overlayAmount = cashedOut ? earnings : betAmount;
 
   return (
     <div className="h-[100dvh] flex flex-col bg-background overflow-hidden select-none">
       <GameHeader balance={balance} />
 
-      {/* Game canvas — maximized for mobile */}
+      {/* Game canvas */}
       <div className="flex-1 flex items-center justify-center min-h-0">
         <div className={`w-full relative ${isPlaying ? 'max-w-full h-full flex items-center justify-center' : 'max-w-[480px] px-0.5 py-1'}`}>
           <canvas
@@ -84,13 +100,6 @@ const Index = () => {
               <p className="text-[9px] text-muted-foreground uppercase tracking-wider leading-tight">Ganhos</p>
               <p className="text-sm font-black text-primary text-glow-gold leading-tight">
                 R$ {earnings.toFixed(2)}
-              </p>
-            </div>
-          )}
-          {isPlaying && (
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
-              <p className="text-[10px] text-muted-foreground/60 bg-background/60 backdrop-blur-sm rounded-full px-3 py-0.5">
-                ↕ Deslize ou use o joystick
               </p>
             </div>
           )}
@@ -112,6 +121,11 @@ const Index = () => {
         </div>
       )}
 
+      {/* Cash Out Button — visible during gameplay */}
+      {(isPlaying || isLost) && (
+        <CashOutButton earnings={earnings} onCashOut={handleCashOut} lost={isLost} />
+      )}
+
       {/* Virtual Joystick */}
       <VirtualJoystick onDirection={setDirection} enabled={isPlaying} />
 
@@ -119,7 +133,7 @@ const Index = () => {
       <GoldenParticles active={showParticles} />
 
       {(gameState === 'won' || gameState === 'lost') && (
-        <GameOverlay type={gameState} amount={betAmount} onClose={handleOverlayClose} />
+        <GameOverlay type={gameState} amount={overlayAmount} onClose={handleOverlayClose} />
       )}
     </div>
   );

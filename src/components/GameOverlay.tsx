@@ -39,9 +39,9 @@ export function GameOverlay({ type, amount, onClose }: GameOverlayProps) {
           <>
             <Trophy className="h-16 w-16 text-primary mx-auto mb-4" />
             <h2 className="text-3xl font-black text-primary text-glow-gold mb-2">
-              VOCÊ GANHOU!
+              RESGATOU!
             </h2>
-            <p className="text-lg text-foreground mb-1">Você dobrou sua aposta!</p>
+            <p className="text-lg text-foreground mb-1">Você resgatou a tempo!</p>
             <p className="text-3xl font-black text-secondary text-glow-blue">
               + R$ {amount.toFixed(2)}
             </p>
