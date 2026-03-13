@@ -1,27 +1,41 @@
-import { Wallet, Plus } from 'lucide-react';
+import { Wallet, Plus, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { WithdrawalModal } from './WithdrawalModal';
+import { DepositModal } from './DepositModal';
+import { useNavigate } from 'react-router-dom';
 
-interface GameHeaderProps {
-  balance: number;
-}
+export function GameHeader() {
+  const { profile, signOut } = useAuth();
+  const navigate = useNavigate();
+  const balance = profile?.balance ?? 0;
 
-export function GameHeader({ balance }: GameHeaderProps) {
   return (
-    <header className="glass-panel px-3 py-2.5 flex items-center justify-between shrink-0">
-      <h1 className="text-lg font-black tracking-wider text-primary text-glow-gold">
-        PAC-<span className="text-secondary text-glow-blue">BET</span>
-      </h1>
+    <header className="relative w-full bg-black/80 backdrop-blur-xl border-b border-white/10 h-16 px-5 flex items-center justify-between z-50 shadow-lg">
+      <div className="flex flex-col">
+        <h1 className="text-base font-black tracking-tighter text-primary text-glow-gold leading-none italic uppercase">
+          PAC <span className="text-white">BET</span>
+        </h1>
+        <p className="text-[12px] text-muted-foreground uppercase tracking-widest font-black opacity-40">Official Arena</p>
+      </div>
 
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1.5 bg-muted px-2.5 py-1.5 rounded-xl">
-          <Wallet className="h-3.5 w-3.5 text-primary" />
-          <span className="font-bold text-foreground text-sm">
+        <div className="flex items-center gap-2 bg-zinc-900/80 border border-white/10 py-2 px-3.5 rounded-full shadow-inner">
+          <Wallet className="h-4 w-4 text-primary" />
+          <span className="font-black text-sm italic tracking-tight">
             R$ {balance.toFixed(2)}
           </span>
         </div>
 
-        <button className="flex items-center gap-1 bg-primary text-primary-foreground px-3 py-1.5 rounded-xl font-bold text-xs active:scale-95 transition-transform glow-gold">
-          <Plus className="h-3.5 w-3.5" />
-          Depósito
+        <WithdrawalModal />
+
+        <DepositModal />
+
+        <button 
+          onClick={() => signOut()}
+          className="ml-1 p-1 text-zinc-600 hover:text-white transition-colors"
+          title="Sair"
+        >
+          <LogOut className="h-4 w-4" />
         </button>
       </div>
     </header>

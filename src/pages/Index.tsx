@@ -10,9 +10,13 @@ import { usePacmanGame } from '@/game/usePacmanGame';
 import { useSwipeControls } from '@/hooks/useSwipeControls';
 import { playWinSound } from '@/utils/sounds';
 import { COLS, ROWS, CELL_SIZE } from '@/game/constants';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
 
 const Index = () => {
-  const [balance, setBalance] = useState(100);
+  const { profile, refreshProfile } = useAuth();
+  const balance = profile?.balance ?? 0;
   const [betAmount, setBetAmount] = useState(5);
   const [rounds, setRounds] = useState<RoundResult[]>([]);
   const [roundCounter, setRoundCounter] = useState(0);
@@ -49,32 +53,75 @@ const Index = () => {
     }
   }, [gameState]);
 
-  const handlePlay = () => {
-    if (betAmount > balance || betAmount <= 0) return;
-    setBalance(prev => prev - betAmount);
-    setCashedOut(false);
-    startGame();
-  };
-
-  const handleCashOut = () => {
-    if (!isPlaying || earnings <= 0) return;
-    setCashedOut(true);
-    playWinSound();
-    setGameState('won');
-  };
-
-  const handleOverlayClose = () => {
-    const won = gameState === 'won';
-    const cashOutAmount = cashedOut ? earnings : (won ? betAmount * 2 : 0);
-
-    if (won) {
-      setBalance(prev => prev + cashOutAmount);
+  const handlePlay = async () => {
+    if (!profile) return;
+    if (betAmount > balance || betAmount <= 0) {
+      toast.error('Saldo insuficiente ou aposta inválida');
+      return;
     }
+
+    try {
+      // Deduct balance in Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .update({ balance: balance - betAmount })
+        .eq('id', profile.id);
+
+      if (error) throw error;
+      
+      await refreshProfile();
+      setCashedOut(false);
+      startGame();
+    } catch (error: any) {
+      toast.error('Erro ao iniciar jogo: ' + error.message);
+    }
+  };
+
+  const handleCashOut = async () => {
+    if (!isPlaying || earnings <= 0 || !profile) return;
+    
+    try {
+      setCashedOut(true);
+      playWinSound();
+      
+      // Update balance in Supabase with earnings
+      const { error } = await supabase
+        .from('profiles')
+        .update({ balance: balance + earnings })
+        .eq('id', profile.id);
+
+      if (error) throw error;
+
+      await refreshProfile();
+      setGameState('won');
+    } catch (error: any) {
+      toast.error('Erro ao resgatar: ' + error.message);
+    }
+  };
+
+  const handleOverlayClose = async () => {
+    const won = gameState === 'won';
+    // If they won by eating all coins (not manual cashout)
+    if (won && !cashedOut && profile) {
+      const winAmount = betAmount * 2;
+      try {
+        await supabase
+          .from('profiles')
+          .update({ balance: balance + winAmount })
+          .eq('id', profile.id);
+        
+        await refreshProfile();
+      } catch (error) {
+        console.error('Error auto-claiming win:', error);
+      }
+    }
+
+    const cashOutAmount = cashedOut ? earnings : (won ? betAmount * 2 : 0);
 
     setRoundCounter(prev => prev + 1);
     setRounds(prev => [
       ...prev,
-      { id: roundCounter, amount: cashedOut ? earnings : betAmount, won },
+      { id: roundCounter, amount: won ? cashOutAmount : betAmount, won },
     ]);
     setCashedOut(false);
     setGameState('idle');
@@ -83,53 +130,51 @@ const Index = () => {
   const overlayAmount = cashedOut ? earnings : betAmount;
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-background overflow-hidden select-none">
-      <GameHeader balance={balance} />
+    <div className="game-container">
+      <GameHeader />
 
-      {/* Game canvas */}
-      <div className="flex-1 flex items-center justify-center min-h-0">
-        <div className={`w-full relative ${isPlaying ? 'max-w-full h-full flex items-center justify-center' : 'max-w-[480px] px-0.5 py-1'}`}>
+      <main className="game-content-scrollable">
+        <div className="game-canvas-wrapper">
           <canvas
             ref={canvasRef}
             width={COLS * CELL_SIZE}
             height={ROWS * CELL_SIZE}
-            className="block rounded-lg w-full h-auto"
+            className="block shadow-[0_0_80px_rgba(0,0,0,0.8)]"
           />
           {isPlaying && (
-            <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-lg px-2.5 py-1">
-              <p className="text-[9px] text-muted-foreground uppercase tracking-wider leading-tight">Ganhos</p>
-              <p className="text-sm font-black text-primary text-glow-gold leading-tight">
+            <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md rounded-xl px-3 py-1.5 border border-white/10 glow-gold">
+              <p className="text-[8px] text-muted-foreground uppercase font-black tracking-widest leading-tight">Ganhos</p>
+              <p className="text-base font-[1000] text-primary text-glow-gold leading-tight italic">
                 R$ {earnings.toFixed(2)}
               </p>
             </div>
           )}
         </div>
-      </div>
+      </main>
 
-      {/* Bottom: Bet Panel + Round History — hidden during gameplay */}
-      {!isPlaying && (
-        <div className="shrink-0 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-          <BetPanel
-            betAmount={betAmount}
-            onBetChange={setBetAmount}
-            onPlay={handlePlay}
-            disabled={isPlaying || betAmount > balance || betAmount <= 0}
-            earnings={earnings}
-            isPlaying={isPlaying}
-          />
-          <RoundHistory rounds={rounds} />
-        </div>
-      )}
+      <footer className="bet-panel-fixed">
+        {!isPlaying ? (
+          <div className="w-full space-y-0">
+            <div className="px-4 py-1">
+              <RoundHistory rounds={rounds} />
+            </div>
+            <BetPanel
+              betAmount={betAmount}
+              onBetChange={setBetAmount}
+              onPlay={handlePlay}
+              disabled={isPlaying || betAmount > balance || betAmount <= 0}
+              earnings={earnings}
+              isPlaying={isPlaying}
+            />
+          </div>
+        ) : (
+          <div className="w-full pb-8 px-4 pt-2">
+            <CashOutButton earnings={earnings} onCashOut={handleCashOut} lost={isLost} />
+          </div>
+        )}
+      </footer>
 
-      {/* Cash Out Button — visible during gameplay */}
-      {(isPlaying || isLost) && (
-        <CashOutButton earnings={earnings} onCashOut={handleCashOut} lost={isLost} />
-      )}
-
-      {/* Virtual Joystick */}
       <VirtualJoystick onDirection={setDirection} enabled={isPlaying} />
-
-      {/* Golden particles on win */}
       <GoldenParticles active={showParticles} />
 
       {(gameState === 'won' || gameState === 'lost') && (
