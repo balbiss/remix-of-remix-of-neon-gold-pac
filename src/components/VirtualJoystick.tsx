@@ -97,20 +97,21 @@ export function VirtualJoystick({ onDirection, enabled }: VirtualJoystickProps) 
         >
           {/* Outer ring */}
           <div
-            className="absolute inset-0 rounded-full border-2 border-primary/30"
+            className="absolute inset-0 rounded-full border border-primary/10"
             style={{
-              background: 'radial-gradient(circle, hsl(45 100% 50% / 0.08), transparent)',
+              background: 'radial-gradient(circle, hsl(45 100% 50% / 0.05), transparent)',
+              opacity: 0.15
             }}
           />
           {/* Knob */}
           <div
-            className="absolute rounded-full bg-primary/40 backdrop-blur-sm border border-primary/50"
+            className="absolute rounded-full bg-primary/20 backdrop-blur-[2px] border border-primary/20"
             style={{
               width: KNOB_SIZE,
               height: KNOB_SIZE,
               left: JOYSTICK_SIZE / 2 - KNOB_SIZE / 2 + knobOffset.x,
               top: JOYSTICK_SIZE / 2 - KNOB_SIZE / 2 + knobOffset.y,
-              boxShadow: '0 0 15px hsl(45 100% 50% / 0.3)',
+              opacity: 0.15
             }}
           />
         </div>

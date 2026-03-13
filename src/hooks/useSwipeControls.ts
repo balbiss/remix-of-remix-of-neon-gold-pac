@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { Direction } from '@/game/constants';
 
-const SWIPE_THRESHOLD = 20;
+const SWIPE_THRESHOLD = 15; // Lower = more sensitive
 
 export function useSwipeControls(
   onDirection: (dir: Direction) => void,

@@ -33,20 +33,19 @@ function findGhostSpawns(): Position[] {
 }
 
 function canMove(maze: number[][], x: number, y: number, dir?: Direction): boolean {
-  const margin = 0.40; // Collision margin (entity radius is 0.45)
-  let cx = x;
-  let cy = y;
+  // Strict look-ahead: we check if the cell we are entering is a wall (0)
+  // Pac-Man is always centered on one axis, so we only check the axis of movement
+  const rX = Math.round(x);
+  const rY = Math.round(y);
 
-  if (dir === 'right') cx += margin;
-  else if (dir === 'left') cx -= margin;
-  else if (dir === 'up') cy -= margin;
-  else if (dir === 'down') cy += margin;
+  if (rY < 0 || rY >= maze.length || rX < 0 || rX >= COLS) return false;
+  
+  // If moving, check both the rounded position and the "floor/ceil" based on direction
+  // to ensure we never even touch the wall boundary pixels
+  const px = dir === 'left' ? Math.floor(x + 0.05) : dir === 'right' ? Math.ceil(x - 0.05) : rX;
+  const py = dir === 'up' ? Math.floor(y + 0.05) : dir === 'down' ? Math.ceil(y - 0.05) : rY;
 
-  const rx = Math.round(cx);
-  const ry = Math.round(cy);
-
-  if (ry < 0 || ry >= maze.length || rx < 0 || rx >= COLS) return false;
-  return maze[ry][rx] !== 0;
+  return maze[py]?.[px] !== 0;
 }
 
 const DIRS: Record<Direction, Position> = {
@@ -127,10 +126,13 @@ export function usePacmanGame() {
           const nextX = parseFloat((ent.pos.x + v.x * SPEED).toFixed(3));
           const nextY = parseFloat((ent.pos.y + v.y * SPEED).toFixed(3));
 
-          // Strict Collision & Bounds with target cell checking
+          // Strict Rigid Collision: If next position is invalid, snap to grid center
           if (canMove(localMaze, nextX, nextY, ent.dir)) {
             ent.pos.x = nextX;
             ent.pos.y = nextY;
+          } else {
+            ent.pos.x = Math.round(ent.pos.x);
+            ent.pos.y = Math.round(ent.pos.y);
           }
         };
 
@@ -207,11 +209,12 @@ export function usePacmanGame() {
         ctx.shadowBlur = 10; ctx.shadowColor = color;
         ctx.fillStyle = color;
         if (isPac) {
-          const angles: any = { right: 0, down: 0.5, left: 1, up: 1.5 };
-          const start = angles[pacmanDirRef.current] * Math.PI;
-          const open = mouthOpenRef.current ? 0.25 : 0.05;
+          const angles: Record<Direction, number> = { right: 0, down: 0.5, left: 1, up: 1.5 };
+          const startAngle = angles[dir || pacmanDirRef.current];
+          const mouthSize = mouthOpenRef.current ? 0.22 : 0.04;
+          
           ctx.beginPath();
-          ctx.arc(ex, ey, r, (start + open) * Math.PI, (start + 2 - open) * Math.PI);
+          ctx.arc(ex, ey, r, (startAngle + mouthSize) * Math.PI, (startAngle + 2 - mouthSize) * Math.PI);
           ctx.lineTo(ex, ey);
           ctx.fill();
         } else {
@@ -228,7 +231,7 @@ export function usePacmanGame() {
         ctx.restore();
       };
 
-      drawEnt(pacmanRef.current, '#FFFF00', true);
+      drawEnt(pacmanRef.current, '#FFFF00', true, pacmanDirRef.current);
       ghostsRef.current.forEach(g => drawEnt(g.pos, g.color, false, g.dir));
 
       animFrameRef.current = requestAnimationFrame(loop);
