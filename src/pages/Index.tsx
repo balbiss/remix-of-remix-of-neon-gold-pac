@@ -68,7 +68,7 @@ const Index = () => {
 
   return (
     <div className="h-[100dvh] flex flex-col bg-background overflow-hidden select-none">
-      {!isPlaying && <GameHeader balance={balance} />}
+      <GameHeader balance={balance} />
 
       {/* Game canvas — maximized for mobile */}
       <div className="flex-1 flex items-center justify-center min-h-0">
