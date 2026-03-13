@@ -7,8 +7,7 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 import { AuthProvider, useAuth } from "./contexts/AuthContext.tsx";
-import Login from "./pages/Login.tsx";
-import Signup from "./pages/Signup.tsx";
+import Auth from "./pages/Auth.tsx";
 import { Navigate } from "react-router-dom";
 
 import Deposit from "./pages/Deposit.tsx";
@@ -59,8 +58,8 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Auth />} />
+            <Route path="/signup" element={<Auth />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
